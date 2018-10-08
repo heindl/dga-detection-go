@@ -1,10 +1,13 @@
-package train
+package parse
 
 import (
 	"bufio"
 	"fmt"
+	"golang.org/x/sync/errgroup"
 	"os"
+	"sort"
 	"strings"
+	"sync"
 )
 
 func ReadExamples(filePath string) (Examples, error) {
@@ -36,11 +39,20 @@ func (Ω Examples) PercentDGA() float64 {
 
 func (Ω Examples) CSV() []byte {
 	y := []string{}
-	for _, e := range Ω {
-		domain := e.Domain()
-		line := fmt.Sprintf("%s,%s", domain.Domain(), domain.TLD())
-		y = append(y, line)
+	locker := sync.Mutex{}
+	eg := errgroup.Group{}
+	for _, _e := range Ω {
+		e := _e
+		eg.Go(func() error {
+			line := ExampleToCSV(e)
+			locker.Lock()
+			defer locker.Unlock()
+			y = append(y, line)
+			return nil
+		})
 	}
+	_ = eg.Wait()
+	sort.Strings(y)
 	return []byte(strings.Join(y, "\n"))
 }
 
@@ -52,10 +64,6 @@ func (Ω Examples) Classes() map[Class]Examples {
 	}
 	for _, e := range Ω {
 		c := e.Class()
-		if _, ok := y[c]; !ok {
-			fmt.Println("Missing class", c)
-			continue
-		}
 		y[c] = append(y[c], e)
 	}
 	return y
@@ -80,17 +88,11 @@ func (Ω Examples) Sources() map[Source]Examples {
 func (Ω Examples) TLDs() map[string]Examples {
 	y := map[string]Examples{}
 	for _, e := range Ω {
-		c := e.Domain().TLD()
-		i := strings.Index(c, ".")
-		if i == -1 {
-			fmt.Println(e, c)
-			continue
+		tld := e.Domain().TLD()
+		if _, ok := y[tld]; !ok {
+			y[tld] = Examples{}
 		}
-		v := c[i:]
-		if _, ok := y[v]; !ok {
-			y[v] = Examples{}
-		}
-		y[v] = append(y[v], e)
+		y[tld] = append(y[tld], e)
 	}
 	return y
 }

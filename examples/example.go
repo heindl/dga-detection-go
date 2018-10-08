@@ -1,39 +1,15 @@
-package train
+package parse
 
 import (
+	"fmt"
 	"golang.org/x/net/publicsuffix"
 	"strings"
 )
 
 type Example interface{
-	Domain() Domain
+	Domain() URI
 	Source() Source
 	Class() Class
-}
-
-type Class int
-const (
-	Unknown Class = 0
-	DGA     Class = 1
-	Legit   Class = 2
-)
-
-func (Ω Class) String() string {
-	switch Ω {
-	case Unknown:
-		return "unknown"
-	case DGA:
-		return "dga"
-	case Legit:
-		return "legit"
-	}
-	return ""
-}
-
-type Source string
-
-func (Ω Source) Escape() string {
-	return strings.Replace(string(Ω), "/", "", -1)
 }
 
 func NewExample(s string) (Example) {
@@ -48,11 +24,11 @@ func NewExample(s string) (Example) {
 
 type splitExample []string
 
-func (Ω splitExample) Domain() Domain {
+func (Ω splitExample) Domain() URI {
 	if len(Ω) == 0 {
-		return Domain("")
+		return URI("")
 	}
-	return Domain(Ω[0])
+	return URI(Ω[0])
 }
 
 func (Ω splitExample) Source() Source {
@@ -108,7 +84,13 @@ func (Ω unsplitExample) Class() Class {
 	return Unknown
 }
 
-func (Ω unsplitExample) Domain() Domain {
+func ExampleToCSV(e Example) string {
+	base := e.Domain()
+	domain := base.Domain()
+	return fmt.Sprintf("%d,%s,%s", EnglishDictionary.LongestSegmentLength(domain), domain, base.TLD())
+}
+
+func (Ω unsplitExample) Domain() URI {
 	raw := string(Ω.trimClass())
 	for {
 		if len(raw) == 0 {
@@ -119,9 +101,9 @@ func (Ω unsplitExample) Domain() Domain {
 			raw = strings.TrimSpace(raw[:len(raw)-1])
 			continue
 		}
-		return Domain(raw)
+		return URI(raw)
 	}
-	return Domain("")
+	return URI("")
 }
 
 func (Ω unsplitExample) trimDomain() unsplitExample {

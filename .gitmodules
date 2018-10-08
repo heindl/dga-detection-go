@@ -1,0 +1,3 @@
+[submodule "aoo-mozilla-en-dict"]
+	path = aoo-mozilla-en-dict
+	url = https://github.com/marcoagpinto/aoo-mozilla-en-dict.git

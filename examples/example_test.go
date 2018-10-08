@@ -1,4 +1,4 @@
-package train
+package parse
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -7,12 +7,12 @@ import (
 
 func TestExampleParser(t *testing.T) {
  for _, e := range []struct{
-	 raw string
-	 class Class
-	 source Source
-	 domain Domain
+	 raw         string
+	 class       Class
+	 source      Source
+	 domain      URI
 	 domainValue string
-	 tldValue string
+	 tldValue    string
  }{
  	{"bmskafjfoenhf.rucryptolockerdga", DGA, "cryptolocker", "bmskafjfoenhf.ru", "ru", "bmskafjfoenhf"},
  	{"hollywoodreporter.comn/alegit", Legit, "n/a","hollywoodreporter.com", "com", "hollywoodreporter"},
