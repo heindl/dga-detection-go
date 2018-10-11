@@ -1,6 +1,9 @@
-package parse
+package examples
+
+import "strings"
 
 type Class int
+
 const (
 	Unknown Class = 0
 	DGA     Class = 1
@@ -17,4 +20,10 @@ func (Ω Class) String() string {
 		return "legit"
 	}
 	return ""
+}
+
+type Source string
+
+func (Ω Source) Escape() string {
+	return strings.Replace(string(Ω), "/", "", -1)
 }

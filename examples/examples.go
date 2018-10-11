@@ -1,17 +1,21 @@
-package parse
+package examples
 
 import (
 	"bufio"
 	"fmt"
-	"golang.org/x/sync/errgroup"
+	"github.com/heindl/dga-detection-go/modpath"
 	"os"
-	"sort"
-	"strings"
-	"sync"
+	"path/filepath"
 )
 
-func ReadExamples(filePath string) (Examples, error) {
-	f, err := os.OpenFile(filePath, os.O_RDONLY, 600)
+func ReadExamples() (Examples, error) {
+
+	modPath, err := modpath.Abs()
+	if err != nil {
+		panic(err)
+	}
+
+	f, err := os.OpenFile(filepath.Join(modPath, "./dataset/dga-dataset.txt"), os.O_RDONLY, 600)
 	if err != nil {
 		return nil, err
 	}
@@ -34,33 +38,14 @@ func (Ω Examples) PercentDGA() float64 {
 			dgas += 1
 		}
 	}
-	return  (dgas * 100) / float64(len(Ω))
-}
-
-func (Ω Examples) CSV() []byte {
-	y := []string{}
-	locker := sync.Mutex{}
-	eg := errgroup.Group{}
-	for _, _e := range Ω {
-		e := _e
-		eg.Go(func() error {
-			line := ExampleToCSV(e)
-			locker.Lock()
-			defer locker.Unlock()
-			y = append(y, line)
-			return nil
-		})
-	}
-	_ = eg.Wait()
-	sort.Strings(y)
-	return []byte(strings.Join(y, "\n"))
+	return (dgas * 100) / float64(len(Ω))
 }
 
 func (Ω Examples) Classes() map[Class]Examples {
 	y := map[Class]Examples{
 		Unknown: Examples{},
-		DGA: Examples{},
-		Legit: Examples{},
+		DGA:     Examples{},
+		Legit:   Examples{},
 	}
 	for _, e := range Ω {
 		c := e.Class()
@@ -88,7 +73,7 @@ func (Ω Examples) Sources() map[Source]Examples {
 func (Ω Examples) TLDs() map[string]Examples {
 	y := map[string]Examples{}
 	for _, e := range Ω {
-		tld := e.Domain().TLD()
+		tld := e.Address().TLD()
 		if _, ok := y[tld]; !ok {
 			y[tld] = Examples{}
 		}
@@ -96,5 +81,3 @@ func (Ω Examples) TLDs() map[string]Examples {
 	}
 	return y
 }
-
-

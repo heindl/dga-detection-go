@@ -1,4 +1,4 @@
-package parse
+package examples
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -6,54 +6,44 @@ import (
 )
 
 func TestExampleParser(t *testing.T) {
- for _, e := range []struct{
-	 raw         string
-	 class       Class
-	 source      Source
-	 domain      URI
-	 domainValue string
-	 tldValue    string
- }{
- 	{"bmskafjfoenhf.rucryptolockerdga", DGA, "cryptolocker", "bmskafjfoenhf.ru", "ru", "bmskafjfoenhf"},
- 	{"hollywoodreporter.comn/alegit", Legit, "n/a","hollywoodreporter.com", "com", "hollywoodreporter"},
- 	{"mail.orlandoscholarguidesmarkets.sczoreodga", DGA, "zoreo", "mail.orlandoscholarguidesmarkets.sc", "sc", "orlandoscholarguidesmarkets"},
- 	{"unblockyoutube.co.ukn/alegit", Legit, "n/a", "unblockyoutube.co.uk", "co.uk", "unblockyoutube"},
- } {
+	for _, e := range []struct {
+		raw         string
+		class       Class
+		source      Source
+		domain      Address
+		tldValue    string
+		domainValue string
+	}{
+		{"bmskafjfoenhf.rucryptolockerdga", DGA, "cryptolocker", "bmskafjfoenhf.ru", "ru", "bmskafjfoenhf"},
+		{"hollywoodreporter.comn/alegit", Legit, "n/a", "hollywoodreporter.com", "com", "hollywoodreporter"},
+		{"mail.orlandoscholarguidesmarkets.sczoreodga", DGA, "zoreo", "mail.orlandoscholarguidesmarkets.sc", "sc", "orlandoscholarguidesmarkets"},
+		{"unblockyoutube.co.ukn/alegit", Legit, "n/a", "unblockyoutube.co.uk", "co.uk", "unblockyoutube"},
+		{"www1.functionalstarterlimitedbecoming.npzoreodga", DGA, "zoreo", "www1.functionalstarterlimitedbecoming.np", "np", "functionalstarterlimitedbecoming"},
+		{"fibrecarpetpermit.mmzoreodga", DGA, "zoreo", "fibrecarpetpermit.mm", "mm", "fibrecarpetpermit"},
+		{"economiesbelievedphones.ckzoreodga", DGA, "zoreo", "economiesbelievedphones.ck", "ck", "economiesbelievedphones"},
+		{"fighteradaptationqualifications.erzoreodga", DGA, "zoreo", "fighteradaptationqualifications.er", "er", "fighteradaptationqualifications"},
+		{"informationscreensaversstickersmanufactured.bnzoreodga", DGA, "zoreo", "informationscreensaversstickersmanufactured.bn", "bn", "informationscreensaversstickersmanufactured"},
+		{"fundamentalultrastainless.jmzoreodga", DGA, "zoreo", "fundamentalultrastainless.jm", "jm", "fundamentalultrastainless"},
+	} {
 
- 	ex := NewExample(e.raw)
+		ex := NewExample(e.raw)
 
- 	assert.Equal(t, ex.Class(), e.class)
-	 assert.Equal(t, ex.Source(), e.source)
-	 assert.Equal(t, ex.Domain(), e.domain)
- 	assert.Equal(t, ex.Domain().TLD(), e.domainValue)
-	 assert.Equal(t, ex.Domain().Domain(), e.tldValue)
+		assert.Equal(t, ex.Class(), e.class)
+		assert.Equal(t, ex.Source(), e.source)
+		assert.Equal(t, ex.Address(), e.domain)
+		assert.Equal(t, ex.Address().TLD(), e.tldValue)
+		assert.Equal(t, ex.Address().Domain(), e.domainValue)
 
- }
+	}
 }
 
-//func TestReadExamples(t *testing.T) {
-//  examples, err := ReadExamples("./dga-dataset.txt")
-//  if err != nil {
-//	  t.Fatal(err)
-//  }
-//	if len(examples) != 157927 {
-//		t.Fatalf("example length: %d", len(examples))
-//	}
-//
-//  classes := examples.Classes()
-//  if len(classes[Unknown]) != 1 {
-//	  t.Fatalf("expected one unknown item, found %d", len(examples))
-//  }
-//
-//  sources := examples.Sources()
-//  for k, _ := range sources {
-//  	fmt.Println("key", k)
-//  }
-//  fmt.Println("sources", len(sources))
-//  fmt.Println("average", float64(len(examples)) / float64(len(classes)))
-//
-//  _ = examples.TLDs()
-//  //	fmt.Println("suffix", i, v.PercentDGA())
-//  //}
-//
-//}
+func TestReadExamples(t *testing.T) {
+	examples, err := ReadExamples()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(examples) != 157927 {
+		t.Fatalf("example length: %d", len(examples))
+	}
+
+}

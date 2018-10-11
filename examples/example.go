@@ -1,18 +1,17 @@
-package parse
+package examples
 
 import (
-	"fmt"
 	"golang.org/x/net/publicsuffix"
 	"strings"
 )
 
-type Example interface{
-	Domain() URI
+type Example interface {
+	Address() Address
 	Source() Source
 	Class() Class
 }
 
-func NewExample(s string) (Example) {
+func NewExample(s string) Example {
 	if strings.ContainsRune(s, 1) {
 		return splitExample(strings.Split(s, string(rune(1))))
 	}
@@ -24,11 +23,11 @@ func NewExample(s string) (Example) {
 
 type splitExample []string
 
-func (Ω splitExample) Domain() URI {
+func (Ω splitExample) Address() Address {
 	if len(Ω) == 0 {
-		return URI("")
+		return Address("")
 	}
-	return URI(Ω[0])
+	return Address(Ω[0])
 }
 
 func (Ω splitExample) Source() Source {
@@ -84,13 +83,7 @@ func (Ω unsplitExample) Class() Class {
 	return Unknown
 }
 
-func ExampleToCSV(e Example) string {
-	base := e.Domain()
-	domain := base.Domain()
-	return fmt.Sprintf("%d,%s,%s", EnglishDictionary.LongestSegmentLength(domain), domain, base.TLD())
-}
-
-func (Ω unsplitExample) Domain() URI {
+func (Ω unsplitExample) Address() Address {
 	raw := string(Ω.trimClass())
 	for {
 		if len(raw) == 0 {
@@ -101,13 +94,13 @@ func (Ω unsplitExample) Domain() URI {
 			raw = strings.TrimSpace(raw[:len(raw)-1])
 			continue
 		}
-		return URI(raw)
+		return Address(raw)
 	}
-	return URI("")
+	return Address("")
 }
 
 func (Ω unsplitExample) trimDomain() unsplitExample {
 	ex := string(Ω)
-	do := string(Ω.Domain())
+	do := string(Ω.Address())
 	return unsplitExample(strings.TrimPrefix(strings.TrimSpace(ex), do))
 }
